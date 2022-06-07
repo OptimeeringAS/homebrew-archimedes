@@ -2,9 +2,9 @@
 
 ## How do I install these formulae?
 
-`brew install optimeeringas/arcl/<formula>`
+`brew install optimeeringas/archimedes/<formula>`
 
-Or `brew tap optimeeringas/arcl` and then `brew install <formula>`.
+Or `brew tap optimeeringas/archimedes` and then `brew install <formula>`.
 
 ## Documentation
 
