@@ -75,4 +75,4 @@ jobs:
         with:
           artifacts: "dist/*"
           commit: master
-          tag: v${{ arcl_version.arcl_version }}
+          tag: v${{ arcl_version.outputs.arcl_version }}
