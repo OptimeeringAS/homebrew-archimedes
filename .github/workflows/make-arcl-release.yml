@@ -44,7 +44,6 @@ jobs:
           name: bottles
           path: '*.bottle.*'
   make-release:
-    needs: test
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
