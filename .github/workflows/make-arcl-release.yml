@@ -7,6 +7,7 @@ on:
       - "pyproject.toml"
 jobs:
   prepare-release:
+    name: Compile binary and upload artifact
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +44,7 @@ jobs:
           name: arcl-macOS-x86_64-v${{ env.ARCHIMEDES_CLI_VERSION }}
           path: dist/arcl-macOS/**/*
   publish-macOS-x86_64-release-to-homebrew:
-    name: Publish macOS-x86_64 release to homebrew
+    name: Download artifact and make a release
     needs: prepare-release
     runs-on: ubuntu-latest
     steps:
