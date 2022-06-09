@@ -1,10 +1,10 @@
 class Arcl < Formula
   desc "CLI tool for the Optimeering Archimedes Platform"
   homepage "https://www.optimeering.com/"
-  url "https://github.com/OptimeeringAS/homebrew-archimedes/releases/download/v1.9.6/arcl-v1.9.6.zip"
-  version "1.9.6"
-  sha256 "0defec1999566430242cb0f4acafc7c6edaeaab0bbe06e8ca3da63401b3869cf"
+  url "https://github.com/OptimeeringAS/homebrew-archimedes/releases/download/v1.7.0/arcl-v1.7.0.zip"
   license "Apache-2.0"
+  version "1.7.0"
+  sha256 "c2c47f0a9d0626d0d7f759d401cca69b3ec66767e876f17005eaef64e13f9573"
 
   def install
     bin.install "arcl"
