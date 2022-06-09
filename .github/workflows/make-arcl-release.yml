@@ -26,7 +26,8 @@ jobs:
       - name: Get version
         id: get-version
         run: |
-          echo "ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
+          ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')
+          echo "ARCHIMEDES_CLI_VERSION=$ARCHIMEDES_CLI_VERSION" >> $GITHUB_ENV
           echo "::set-output name=arcl_version::$ARCHIMEDES_CLI_VERSION"
       - name: Compile binaries for x86_64
         run: |
