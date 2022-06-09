@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "pyproject.toml"
 jobs:
   test:
     strategy:
@@ -54,6 +56,7 @@ jobs:
         run: |
           python3 -m pip install pip wheel poetry --upgrade
           poetry config virtualenvs.in-project true
+          poetry update --lock
           poetry install
       - name: Get version
         run: |
@@ -73,3 +76,15 @@ jobs:
           artifacts: "dist/*"
           commit: master
           tag: v${{ env.ARCHIMEDES_CLI_VERSION }}
+      - name: Update arcl.rb file
+        run: |
+          mkdir changes/Formula/
+          pip install jinja2-cli
+          jinja2 arcl.rb.jinja2 -o changes/Formula/arcl.rb -D version=${{ env.ARCHIMEDES_CLI_VERSION }} -D sha256_hash_of_zip=$(python3 sha256.py ./dist/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip)
+      - name: Push updated arcl formula
+        uses: tagus/git-deploy@v0.4.1
+        with:
+          changes: changes
+          name: Optimeering AS (auto)
+          email: dev@optimeering.com
+          message: Update arcl version
