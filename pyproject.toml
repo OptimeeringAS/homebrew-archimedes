@@ -5,7 +5,7 @@ description = "Package for building arcl macOS binaries"
 authors = []
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.9,<3.11"
 arcl = "1.7.1"
 
 [tool.poetry.dev-dependencies]
