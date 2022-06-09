@@ -85,3 +85,7 @@ jobs:
           name: Optimeering AS (auto)
           email: dev@optimeering.com
           message: Update arcl version
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: arcl-macOS-x86_64-v${{ needs.check-tag.outputs.release_version }}
