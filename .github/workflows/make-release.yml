@@ -65,7 +65,7 @@ jobs:
           chmod +x ./dist/arcl
       - name: Zip the binary and delete it
         env:
-          ARCHIMEDES_CLI_VERSION: ${{ arcl_version.outputs.arcl_version }}
+          ARCHIMEDES_CLI_VERSION: ${{ make-release.arcl_version.outputs.arcl_version }}
         run: |
           cd dist/
           zip -9 arcl-v${ARCHIMEDES_CLI_VERSION}.zip arcl
@@ -75,4 +75,4 @@ jobs:
         with:
           artifacts: "dist/*"
           commit: master
-          tag: v${{ arcl_version.outputs.arcl_version }}
+          tag: v${{ make-release.arcl_version.outputs.arcl_version }}
