@@ -57,10 +57,10 @@ jobs:
           poetry install
       - name: Get version
         run: |
-          echo "ARCHIMEDES_CLI_VERSION=$(python3 -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
+          echo "ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
       - name: Compile binaries for x86_64
         run: |
-          poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/Lib/site-packages/arcl/cli.py
+          poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/lib/python3.9/site-packages/arcl/cli.py
           chmod +x ./dist/arcl
       - name: Zip the binary and delete it
         run: |
