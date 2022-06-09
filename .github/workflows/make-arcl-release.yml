@@ -9,6 +9,8 @@ jobs:
   prepare-release:
     name: Compile binary and upload artifact
     runs-on: macos-latest
+    outputs:
+      arcl_version: ${{ steps.get-version.outputs.arcl_version }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -22,8 +24,10 @@ jobs:
           poetry update --lock
           poetry install
       - name: Get version
+        id: get-version
         run: |
           echo "ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
+          echo "::set-output name=arcl_version::$ARCHIMEDES_CLI_VERSION"
       - name: Compile binaries for x86_64
         run: |
           poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/lib/python3.9/site-packages/arcl/cli.py
@@ -49,30 +53,16 @@ jobs:
     needs: prepare-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: |
-          python3 -m pip install pip wheel poetry --upgrade
-          poetry config virtualenvs.in-project true
-          poetry update --lock
-          poetry install
-      - name: Get version
-        run: |
-          echo "ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: arcl-macOS-x86_64-v${{ env.ARCHIMEDES_CLI_VERSION }}
+          name: arcl-macOS-x86_64-v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Create release in homebrew-archimedes
         uses: ncipollo/release-action@v1.10.0
         with:
           artifacts: "bin/*"
           commit: master
-          tag: v${{ env.ARCHIMEDES_CLI_VERSION }}
+          tag: v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Create a folder with files to upload
         run: |
           mkdir changes
@@ -81,6 +71,7 @@ jobs:
         uses: tagus/git-deploy@v0.4.1
         with:
           changes: changes
+          repository: git@github.com:OptimeeringAS/homebrew-archimedes.git
           ssh_key: ${{ secrets.HOMEBREW_ARCHIMEDES_DEPLOY_KEY }}
           name: Optimeering AS (auto)
           email: dev@optimeering.com
@@ -88,4 +79,4 @@ jobs:
       - name: Delete artifact
         uses: geekyeggo/delete-artifact@v1
         with:
-          name: arcl-macOS-x86_64-v${{ needs.check-tag.outputs.release_version }}
+          name: arcl-macOS-x86_64-v${{ needs.prepare-release.outputs.arcl_version }}
