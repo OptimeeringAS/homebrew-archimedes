@@ -1,0 +1,78 @@
+name: make release on push
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Cache Homebrew Bundler RubyGems
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-rubygems-
+
+      - name: Install Homebrew Bundler RubyGems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: brew install-bundler-gems
+
+      - run: brew test-bot --only-cleanup-before
+
+      - run: brew test-bot --only-setup
+
+      - run: brew test-bot --only-tap-syntax
+
+      - run: brew test-bot --only-formulae
+        if: github.event_name == 'pull_request'
+
+      - name: Upload bottles as artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@main
+        with:
+          name: bottles
+          path: '*.bottle.*'
+  make-release:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install arcl and pyinstaller
+        run: |
+          python3 -m pip install pip wheel poetry --upgrade
+          poetry config virtualenvs.in-project true
+          poetry install
+      - name: Get version
+        id: arcl_version
+        run: |
+          echo "::set-output name=arcl_version::$(python3 -c 'import arcl; print(arcl.__version__)')"
+      - name: Compile binaries for x86_64
+        run: |
+          poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/Lib/site-packages/arcl/cli.py
+          chmod +x ./dist/arcl
+      - name: Zip the binary and delete it
+        env:
+          ARCHIMEDES_CLI_VERSION: ${{ arcl_version.arcl_version }}
+        run: |
+          cd dist/
+          zip -9 arcl-v${ARCHIMEDES_CLI_VERSION}.zip arcl
+          rm arcl
+      - name: Create release in homebrew-archimedes
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          artifacts: "dist/*"
+          commit: master
+          tag: v${{ arcl_version.arcl_version }}
