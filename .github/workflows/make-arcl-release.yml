@@ -76,7 +76,7 @@ jobs:
           ssh_key: ${{ secrets.HOMEBREW_ARCHIMEDES_DEPLOY_KEY }}
           name: Optimeering AS (auto)
           email: dev@optimeering.com
-          message: Update arcl version
+          message: Update arcl formula to version v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Delete artifact
         uses: geekyeggo/delete-artifact@v1
         with:
