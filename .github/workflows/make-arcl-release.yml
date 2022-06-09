@@ -31,13 +31,14 @@ jobs:
       - name: Zip the binary and delete it
         run: |
           mkdir -p dist/arcl-macOS/Formula
+          mkdir -p dist/arcl-macOS/bin
           cd dist/
-          zip -9 arcl-macOS/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip arcl
+          zip -9 arcl-macOS/bin/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip arcl
           rm arcl
       - name: Update arcl.rb file
         run: |
           pip install jinja2-cli
-          jinja2 arcl.rb.jinja2 -o dist/arcl-macOS/Formula/arcl.rb -D version=${{ env.ARCHIMEDES_CLI_VERSION }} -D sha256_hash_of_zip=$(python3 sha256.py ./dist/arcl-macOS/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip)
+          jinja2 arcl.rb.jinja2 -o dist/arcl-macOS/Formula/arcl.rb -D version=${{ env.ARCHIMEDES_CLI_VERSION }} -D sha256_hash_of_zip=$(python3 sha256.py ./dist/arcl-macOS/bin/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip)
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -69,13 +70,18 @@ jobs:
       - name: Create release in homebrew-archimedes
         uses: ncipollo/release-action@v1.10.0
         with:
-          artifacts: "dist/*"
+          artifacts: "bin/*"
           commit: master
           tag: v${{ env.ARCHIMEDES_CLI_VERSION }}
+      - name: Create a folder with files to upload
+        run: |
+          mkdir changes
+          mv ./Formula ./changes/
       - name: Push updated arcl formula
         uses: tagus/git-deploy@v0.4.1
         with:
           changes: changes
+          ssh_key: ${{ secrets.HOMEBREW_ARCHIMEDES_DEPLOY_KEY }}
           name: Optimeering AS (auto)
           email: dev@optimeering.com
           message: Update arcl version
