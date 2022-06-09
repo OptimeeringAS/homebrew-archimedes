@@ -56,7 +56,6 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install
       - name: Get version
-        id: arcl_version
         run: |
           echo "ARCHIMEDES_CLI_VERSION=$(python3 -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
       - name: Compile binaries for x86_64
