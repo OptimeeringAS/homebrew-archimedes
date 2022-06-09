@@ -6,7 +6,7 @@ on:
     paths:
       - "pyproject.toml"
 jobs:
-  make-release:
+  prepare-release:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,20 +29,48 @@ jobs:
           chmod +x ./dist/arcl
       - name: Zip the binary and delete it
         run: |
+          mkdir -p dist/arcl-macOS/Formula
           cd dist/
-          zip -9 arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip arcl
+          zip -9 arcl-macOS/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip arcl
           rm arcl
+      - name: Update arcl.rb file
+        run: |
+          pip install jinja2-cli
+          jinja2 arcl.rb.jinja2 -o dist/arcl-macOS/Formula/arcl.rb -D version=${{ env.ARCHIMEDES_CLI_VERSION }} -D sha256_hash_of_zip=$(python3 sha256.py ./dist/arcl-macOS/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: arcl-macOS-x86_64-v${{ env.ARCHIMEDES_CLI_VERSION }}
+          path: dist/arcl-macOS/**/*
+  publish-macOS-x86_64-release-to-homebrew:
+    name: Publish macOS-x86_64 release to homebrew
+    needs: prepare-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install arcl and pyinstaller
+        run: |
+          python3 -m pip install pip wheel poetry --upgrade
+          poetry config virtualenvs.in-project true
+          poetry update --lock
+          poetry install
+      - name: Get version
+        run: |
+          echo "ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')" >> $GITHUB_ENV
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: arcl-macOS-x86_64-v${{ env.ARCHIMEDES_CLI_VERSION }}
       - name: Create release in homebrew-archimedes
         uses: ncipollo/release-action@v1.10.0
         with:
           artifacts: "dist/*"
           commit: master
           tag: v${{ env.ARCHIMEDES_CLI_VERSION }}
-      - name: Update arcl.rb file
-        run: |
-          mkdir -p changes/Formula/
-          pip install jinja2-cli
-          jinja2 arcl.rb.jinja2 -o changes/Formula/arcl.rb -D version=${{ env.ARCHIMEDES_CLI_VERSION }} -D sha256_hash_of_zip=$(python3 sha256.py ./dist/arcl-v${{ env.ARCHIMEDES_CLI_VERSION }}.zip)
       - name: Push updated arcl formula
         uses: tagus/git-deploy@v0.4.1
         with:
