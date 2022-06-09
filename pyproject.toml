@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "homebrew-archimedes"
 version = "0.1.0"
-description = ""
+description = "Package for building arcl macOS binaries"
 authors = []
 
 [tool.poetry.dependencies]
