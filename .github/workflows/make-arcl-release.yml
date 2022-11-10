@@ -31,7 +31,7 @@ jobs:
           echo "::set-output name=arcl_version::$ARCHIMEDES_CLI_VERSION"
       - name: Compile binaries for x86_64
         run: |
-          poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/lib/python3.9/site-packages/arcl/cli.py
+          poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/lib/python$(poetry run python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}");')/site-packages/arcl/cli.py
           chmod +x ./dist/arcl
       - name: Zip the binary and delete it
         run: |
