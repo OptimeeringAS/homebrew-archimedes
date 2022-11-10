@@ -19,7 +19,7 @@ jobs:
           python-version: '3.10'
       - name: Install dependencies
         run: |
-          python3 -m pip install pip wheel poetry --upgrade
+          python3 -m pip install pip wheel poetry==1.1.* --upgrade
           poetry config virtualenvs.in-project true
           poetry update --lock
           poetry install
