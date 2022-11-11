@@ -12,9 +12,9 @@ jobs:
     outputs:
       arcl_version: ${{ steps.get-version.outputs.arcl_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: Install dependencies
@@ -28,7 +28,7 @@ jobs:
         run: |
           ARCHIMEDES_CLI_VERSION=$(poetry run python -c 'import arcl; print(arcl.__version__)')
           echo "ARCHIMEDES_CLI_VERSION=$ARCHIMEDES_CLI_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=arcl_version::$ARCHIMEDES_CLI_VERSION"
+          echo "arcl_version=$ARCHIMEDES_CLI_VERSION" >> $GITHUB_OUTPUT
       - name: Compile binaries for x86_64
         run: |
           poetry run pyinstaller --target-architecture x86_64 --hidden-import cookiecutter.extensions --hidden-import jinja2_time --name arcl --onefile ./.venv/lib/python$(poetry run python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}");')/site-packages/arcl/cli.py
@@ -59,7 +59,7 @@ jobs:
         with:
           name: arcl-macOS-x86_64-v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Create release in homebrew-archimedes
-        uses: ncipollo/release-action@v1.10.0
+        uses: ncipollo/release-action@v1.11.1
         with:
           artifacts: "bin/*"
           commit: master
@@ -78,6 +78,6 @@ jobs:
           email: dev@optimeering.com
           message: Update arcl formula to version v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Delete artifact
-        uses: geekyeggo/delete-artifact@v1
+        uses: geekyeggo/delete-artifact@v2
         with:
           name: arcl-macOS-x86_64-v${{ needs.prepare-release.outputs.arcl_version }}
