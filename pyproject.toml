@@ -2,15 +2,15 @@
 name = "homebrew-archimedes"
 version = "0.1.0"
 description = "Package for building arcl macOS binaries"
-authors = []
+authors = ["Optimeering AS <dev@optimeering.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 arcl = "1.7.8"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
