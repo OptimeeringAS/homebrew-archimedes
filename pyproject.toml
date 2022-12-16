@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "homebrew-archimedes"
-version = "0.1.3"
+version = "0.1.1"
 description = "Package for building arcl macOS binaries"
 authors = ["Optimeering AS <dev@optimeering.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-arcl = "1.7.11"
+arcl = "1.7.13"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.1"
