@@ -6,7 +6,7 @@ authors = ["Optimeering AS <dev@optimeering.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-arcl = "1.7.13"
+arcl = "1.7.14"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^5.1"
