@@ -61,7 +61,7 @@ jobs:
         with:
           name: arcl-macOS-x86_64-v${{ needs.prepare-release.outputs.arcl_version }}
       - name: Create release in homebrew-archimedes
-        uses: ncipollo/release-action@v1.11.1
+        uses: ncipollo/release-action@v1.12.0
         with:
           artifacts: "bin/*"
           commit: master
