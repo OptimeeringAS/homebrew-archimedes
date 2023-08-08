@@ -53,6 +53,8 @@ jobs:
     name: Download artifact, make a release and update arcl.rb
     needs: prepare-release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
